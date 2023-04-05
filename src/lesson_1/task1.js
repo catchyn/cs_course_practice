@@ -32,6 +32,16 @@ class ProcessUint8Array {
         this.checkCorrectRange(index, num_bit);
         return (this.uint8Array[index] & (1 << num_bit)) != 0 ? 1 : 0;
     }
+    /**
+     * Выставляем значение в массиве Uint8Array по индексу элемента и номеру бита справа-налево.
+     * @param index индекс элемента
+     * @param num_bit номер бита
+     * @param value значение бита
+     */
+    set(index, num_bit, value) {
+        this.checkCorrectRange(index, num_bit);
+        this.uint8Array[index] = this.uint8Array[index] + Math.pow(2, num_bit) * (value === 0 ? -1 : 1);
+    }
 }
 const createBitGetter = (uint8Array) => {
     return new ProcessUint8Array(uint8Array);
@@ -40,15 +50,14 @@ const bitGetter = createBitGetter(new Uint8Array([0b1110, 0b1101]));
 // Второй параметр это порядок бита "справа-налево"
 console.log(bitGetter.get(0, 1)); // 1
 console.log(bitGetter.get(1, 1)); // 0
-try {
-    console.log(bitGetter.get(2, 1)); // 0
-}
-catch (e) {
-    console.log(e === null || e === void 0 ? void 0 : e.message);
-}
-try {
-    console.log(bitGetter.get(1, 9)); // 0
-}
-catch (e) {
-    console.log(e === null || e === void 0 ? void 0 : e.message);
-}
+////////////// TASK 2 ///////////////
+const createBitAccessor = (uint8Array) => {
+    return new ProcessUint8Array(uint8Array);
+};
+const bitAccessor = createBitAccessor(new Uint8Array([0b1110, 0b1101]));
+console.log(bitAccessor.get(0, 1)); // 1
+bitAccessor.set(0, 1, 0); //
+console.log(bitAccessor.get(0, 1)); // 0
+console.log(bitAccessor.get(0, 7)); // 0
+bitAccessor.set(0, 7, 1); //
+console.log(bitAccessor.get(0, 7)); // 1
