@@ -6,6 +6,8 @@
  * Класс обработки Uint8Array.
  */
 class ProcessUint8Array {
+    uint8Array;
+    maxSize;
     constructor(uint8Array) {
         this.uint8Array = uint8Array;
         this.maxSize = uint8Array.length;
