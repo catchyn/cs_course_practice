@@ -1,7 +1,7 @@
 /**
  * Написать функцию, которая принимает Uint8Array и позволяет обратиться к биту конкретного элемента.
  */
-import {BitAccessorUint8Array} from "../common/bitAccessorUint8Array";
+import {BitAccessorUint8Array} from "../../common/BitAccessorUint8Array";
 
 const createBitGetter = (uint8Array: Uint8Array) => {
   return new BitAccessorUint8Array(uint8Array);
