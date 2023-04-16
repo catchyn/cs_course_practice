@@ -2,11 +2,14 @@
   "name": "cs_course_practice",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "check-types": "tsc --noemit",
     "eslint": "eslint",
-    "lint": "npm run eslint && npm run check-types"
+    "lint": "npm run eslint && npm run check-types",
+    "tsc": "tsc",
+    "home-1-task-1": "npx ts-node -P tsconfig.node.json -r tsconfig-paths/register ./src/lesson_1/task1.ts",
+    "home-2-task-1": "tsc && browser-sync start --server --startPath src/lesson_2/task1/index.html",
+    "home-2-task-2": "npx ts-node -P tsconfig.node.json -r tsconfig-paths/register ./src/lesson_2/task2/task.ts"
   },
   "repository": {
     "type": "git",
@@ -23,11 +26,13 @@
     "@typescript-eslint/eslint-plugin-tslint": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "babel-eslint": "^10.1.0",
+    "browser-sync": "^2.29.1",
     "eslint": "^8.37.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "prettier": "2.8.7",
     "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.0.3"
   }
 }

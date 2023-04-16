@@ -1,0 +1,17 @@
+canvas {
+    border: 3px solid rgba(255, 0, 0, 0.83);
+    margin-top: 12px;
+}
+
+canvas:not(:last-child) {
+    margin-right: 24px;
+}
+
+.Container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/*.Container .Container_Source {*/
+/*    margin-right: 24px;*/
+/*}*/
