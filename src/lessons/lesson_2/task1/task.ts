@@ -1,4 +1,4 @@
-import { CanvasUtils } from '../../utils/canvas.js';
+import { CanvasUtils } from '../../../utils/canvas.js';
 
 function grayscale(value: string): Promise<HTMLCanvasElement>;
 function grayscale(value: HTMLCanvasElement): HTMLCanvasElement;

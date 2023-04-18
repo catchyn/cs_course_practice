@@ -5,7 +5,7 @@
     "noImplicitAny": false,
     "moduleResolution": "node",
     "sourceMap": true,
-    "target": "ES5",
+    "target": "ESNext",
     "outDir": "nodeDist"
   },
   "include": ["src"],

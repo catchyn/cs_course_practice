@@ -1,7 +1,7 @@
 // Написать функцию кодирования информации по схеме
 
-import {BitAccessorUint8Array} from "../../common/bitAccessorUint8Array";
-import {BitAccessor} from "../../utils/bitAccessor";
+import {BitAccessorUint8Array} from "../../../common/BitAccessorUint8Array";
+import {BitAccessor} from "../../../utils/bitAccessor";
 
 class TypeValueError extends Error {
   constructor(frame: unknown, framePos: number, frameType: string) {
