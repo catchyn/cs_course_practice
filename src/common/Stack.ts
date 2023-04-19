@@ -19,7 +19,7 @@ export class Stack {
   }
 
   isFull() {
-    return this.#curSize === this.#array.length;
+    return this.#curSize === this.#array.length - 1;
   }
 
   push(value: number) {
