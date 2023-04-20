@@ -14,7 +14,8 @@
     "home-3-task-3": "npx ts-node -P tsconfig.node.json -r tsconfig-paths/register src/lessons/lesson_3/task3/index.ts",
     "home-4-task-1": "npx ts-node -P tsconfig.node.json -r tsconfig-paths/register src/lessons/lesson_4/task1/index.ts",
     "home-4-task-2": "npx ts-node -P tsconfig.node.json -r tsconfig-paths/register src/lessons/lesson_4/task2/index.ts",
-    "home-4-task-3": "npx ts-node -P tsconfig.node.json -r tsconfig-paths/register src/lessons/lesson_4/task3/index.ts"
+    "home-4-task-3": "npx ts-node -P tsconfig.node.json -r tsconfig-paths/register src/lessons/lesson_4/task3/index.ts",
+    "home-5-task-3": "npx ts-node -P tsconfig.node.json -r tsconfig-paths/register src/lessons/lesson_5/task3/index.ts"
   },
   "repository": {
     "type": "git",
