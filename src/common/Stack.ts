@@ -1,17 +1,15 @@
-import { TypedArray } from '../types/TypedArray';
-import { typedArrayMap } from '../utils/typedArray';
-import { TypedArrayMap } from '../types/TypedArrayMap';
+import { TypedArray, TypedArrayType } from '../types/TypedArray';
 
 export class Stack {
-  #array: TypedArrayMap[keyof TypedArrayMap];
+  #array: TypedArray;
   #curSize = 0;
 
   get head(): number {
     return this.#array[this.#curSize - 1];
   }
 
-  constructor(type: TypedArray, size: number) {
-    this.#array = typedArrayMap[type](size);
+  constructor(typedArray: TypedArrayType, size: number) {
+    this.#array = new typedArray(size);
   }
 
   isEmpty() {
@@ -32,7 +30,7 @@ export class Stack {
 
   pop(): number {
     if (this.isEmpty()) {
-      throw new Error("Stack is fulled. Can't push value");
+      throw new Error("Stack is empty. Can't pop value");
     }
     const elem = this.#array[this.#curSize - 1];
     this.#array[this.#curSize - 1] = 0;

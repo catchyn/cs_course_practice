@@ -1,6 +1,6 @@
 import { Stack } from '../../../common/Stack';
 
-const stack = new Stack('Int32Array', 10);
+const stack = new Stack<typeof Int32Array>(Int32Array, 10);
 
 stack.push(10);
 stack.push(11);
