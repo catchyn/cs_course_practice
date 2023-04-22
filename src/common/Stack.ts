@@ -1,40 +1,26 @@
-import { TypedArray, TypedArrayType } from '../types/TypedArray';
+export class Stack<T> {
+  array: T[] = [];
 
-export class Stack {
-  #array: TypedArray;
-  #curSize = 0;
-
-  get head(): number {
-    return this.#array[this.#curSize - 1];
+  constructor(array?: T[]) {
+    this.array = array || [];
   }
 
-  constructor(typedArray: TypedArrayType, size: number) {
-    this.#array = new typedArray(size);
+  push(value: T) {
+    this.array.push(value);
   }
 
-  isEmpty() {
-    return this.#curSize === 0;
+  pop(): T {
+    return this.array.pop();
   }
 
-  isFull() {
-    return this.#curSize === this.#array.length - 1;
+  isEmpty(): boolean {
+    return this.array.length === 0;
   }
 
-  push(value: number) {
-    if (this.isFull()) {
-      throw new Error("Stack is fulled. Can't push value");
-    }
-    this.#array[this.#curSize] = value;
-    this.#curSize++;
-  }
-
-  pop(): number {
+  peek(): T | undefined {
     if (this.isEmpty()) {
-      throw new Error("Stack is empty. Can't pop value");
+      return;
     }
-    const elem = this.#array[this.#curSize - 1];
-    this.#array[this.#curSize - 1] = 0;
-    this.#curSize--;
-    return elem;
+    return this.array[this.array.length - 1];
   }
 }

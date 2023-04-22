@@ -1,6 +1,6 @@
-import { Stack } from '../../../common/Stack';
+import { TypedArrayStack } from '../../../common/TypedArrayStack';
 
-const stack = new Stack<typeof Int32Array>(Int32Array, 10);
+const stack = new TypedArrayStack<typeof Int32Array>(Int32Array, 10);
 
 stack.push(10);
 stack.push(11);
