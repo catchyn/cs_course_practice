@@ -10,7 +10,7 @@ const collapseByStack = (obj) => {
     const keys = Object.keys(value);
     for (let i = keys.length - 1; i >= 0; i--) {
       const j = Array.isArray(value) ? keys.length - 1 - i : i;
-      if (typeof value[keys[j]] === 'object') {
+      if (typeof value[keys[j]] === 'object' && value[keys[j]] !== null) {
         stack.push([value[keys[j]], (resultKey || '') + keys[j] + '.']);
         continue;
       }
@@ -22,7 +22,7 @@ const collapseByStack = (obj) => {
 };
 
 const collapseByFunc = (obj, valueStr = '', result = {}) => {
-  if (typeof obj !== 'object') {
+  if (typeof obj !== 'object' || obj === null) {
     result[valueStr ? valueStr.slice(0, -1) : ''] = obj;
     return result;
   }
