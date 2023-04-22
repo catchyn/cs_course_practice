@@ -1,6 +1,10 @@
 export class Stack<T> {
   array: T[] = [];
 
+  constructor(array?: T[]) {
+    this.array = array || [];
+  }
+
   push(value: T) {
     this.array.push(value);
   }
