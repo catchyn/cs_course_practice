@@ -19,13 +19,13 @@ export class Vector<T extends TypedArrayType> {
   }
 
   push(...values: number[]): void {
-    if (this.length + values.length >= this.#capacity) {
-      this.#expandBuffer();
+    const targetCapacity = this.length + values.length;
+    if (targetCapacity > this.#capacity) {
+      this.#expandCapacity(targetCapacity);
+      this.#buffer = this.#createBuffer([this.#buffer]);
     }
-    for (const value of values) {
-      this.#buffer[this.length] = value;
-      this.length++;
-    }
+    this.#buffer.set(values, this.length);
+    this.length += values.length;
   }
 
   pop(): number {
@@ -44,10 +44,11 @@ export class Vector<T extends TypedArrayType> {
   }
 
   unshift(...values: number[]): void {
-    if (this.length + values.length >= this.#capacity) {
-      this.#expandBuffer();
+    const targetCapacity = this.length + values.length;
+    if (targetCapacity >= this.#capacity) {
+      this.#expandCapacity(targetCapacity);
     }
-    this.#buffer = new this.#TypedArrayConstructor([...values, ...this.#buffer]);
+    this.#buffer = this.#createBuffer([values, this.#buffer.slice(0, -values.length)]);
     this.length += values.length;
   }
 
@@ -55,12 +56,23 @@ export class Vector<T extends TypedArrayType> {
     return this.#capacity;
   }
 
-  #expandBuffer() {
-    this.#capacity *= this.#EXPAND_FACTOR;
-    const newBuffer = new this.#TypedArrayConstructor(this.#capacity);
-    for (let i = 0; i < this.#capacity; i++) {
-      newBuffer[i] = this.#buffer[i];
+  getBuffer() {
+    return this.#buffer;
+  }
+
+  #expandCapacity(targetCapacity: number): void {
+    while (this.#capacity < targetCapacity) {
+      this.#capacity *= this.#EXPAND_FACTOR;
     }
-    this.#buffer = newBuffer;
+  }
+
+  #createBuffer(arrays: ArrayLike<number>[]): TypedArray {
+    const newBuffer = new this.#TypedArrayConstructor(this.#capacity);
+    let offset = 0;
+    for (const array of arrays) {
+      newBuffer.set(array, offset);
+      offset += array.length;
+    }
+    return newBuffer;
   }
 }
