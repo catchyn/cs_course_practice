@@ -18,5 +18,5 @@ try {
 
   console.log(queue.pop()); // Exception
 } catch (e) {
-  console.log('error message: ', e.message);
+  console.log('error message: ', (e as Error)?.message);
 }

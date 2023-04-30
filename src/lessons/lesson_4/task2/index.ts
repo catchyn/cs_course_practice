@@ -12,5 +12,5 @@ console.log(dequeue.pop()); // 10
 try {
   console.log(dequeue.pop()); // Exception
 } catch (e) {
-  console.error('Error: ', e.message);
+  console.error('Error: ', (e as Error).message);
 }

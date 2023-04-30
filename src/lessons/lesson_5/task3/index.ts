@@ -2,14 +2,14 @@ import { Stack } from '../../../common/Stack';
 
 const braces: string[] = ['{', '}', '[', ']', '(', ')'];
 
-const braceMap = {
+const braceMap: { [key in string]: string } = {
   '{': '}',
   '[': ']',
   '(': ')',
 };
 
 const isValid = function (s: string): boolean {
-  const stack = new Stack();
+  const stack = new Stack<string>();
   for (let i = 0; i < s.length; i++) {
     if (!braces.some((ch) => ch === s[i])) {
       continue;
@@ -19,7 +19,7 @@ const isValid = function (s: string): boolean {
       stack.push(s[i]);
     } else {
       const lastChar = stack.peek();
-      if (braceMap[lastChar] === s[i]) {
+      if (lastChar && braceMap[lastChar] === s[i]) {
         stack.pop();
       } else {
         stack.push(s[i]);

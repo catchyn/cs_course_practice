@@ -128,8 +128,9 @@ export class HashMap {
     const newSize = this.#getPrime(2 * this.#size);
     const newHashMap = new HashMap(newSize);
     for (let i = 0; i < this.#buffer.length; i++) {
-      if (this.#buffer[i]) {
-        const [key, value] = this.#buffer[i];
+      const item = this.#buffer[i];
+      if (item) {
+        const [key, value]: [key: unknown, value: unknown] = item;
         newHashMap.set(key, value);
       }
     }
