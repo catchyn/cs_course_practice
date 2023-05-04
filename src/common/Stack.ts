@@ -9,17 +9,20 @@ export class Stack<T> {
     this.array.push(value);
   }
 
-  pop(): T | undefined {
-    return this.array.pop();
+  pop(): T {
+    if (this.isEmpty()) {
+      throw Error('Стек пуст');
+    }
+    return this.array.pop() as T;
   }
 
   isEmpty(): boolean {
     return this.array.length === 0;
   }
 
-  peek(): T | undefined {
+  peek(): T {
     if (this.isEmpty()) {
-      return;
+      throw Error('Стек пуст');
     }
     return this.array[this.array.length - 1];
   }

@@ -125,23 +125,11 @@ export class LinkedList<T> {
     console.log(str);
   }
 
-  [Symbol.iterator]() {
+  *[Symbol.iterator]() {
     let current = this.first;
-    return {
-      next() {
-        if (!current) {
-          return {
-            done: true,
-          };
-        } else {
-          const value = current;
-          current = current.next;
-          return {
-            done: false,
-            value: value,
-          };
-        }
-      },
-    };
+    while (current) {
+      yield current;
+      current = current.next;
+    }
   }
 }

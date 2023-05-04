@@ -18,4 +18,8 @@ export class Queue<T> {
     this.#head = this.#list.first;
     return node.value;
   }
+
+  isEmpty(): boolean {
+    return this.#head === null;
+  }
 }
