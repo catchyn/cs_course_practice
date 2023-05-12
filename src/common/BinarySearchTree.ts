@@ -1,3 +1,5 @@
+import { Queue } from './Queue';
+
 class TreeNode<T> {
   value: T;
   left: TreeNode<T> | null = null;
@@ -39,6 +41,56 @@ export class BinarySearchTree<T> {
     }
   }
 
+  *preOrder(node?: TreeNode<T> | null): Generator<T> {
+    if (node === undefined) {
+      node = this.#root;
+    }
+
+    if (node !== null) {
+      yield node.value;
+      yield* this.preOrder(node.left);
+      yield* this.preOrder(node.right);
+    }
+  }
+
+  *inOrder(node?: TreeNode<T> | null): Generator<T> {
+    if (node === undefined) {
+      node = this.#root;
+    }
+
+    if (node !== null) {
+      yield* this.inOrder(node.left);
+      yield node.value;
+      yield* this.inOrder(node.right);
+    }
+  }
+
+  *postOrder(node?: TreeNode<T> | null): Generator<T> {
+    if (node === undefined) {
+      node = this.#root;
+    }
+
+    if (node !== null) {
+      yield* this.postOrder(node.left);
+      yield* this.postOrder(node.right);
+      yield node.value;
+    }
+  }
+
+  *bfs(): Generator<[T, number]> {
+    const q = new Queue<[TreeNode<T>, number]>();
+    if (!this.#root) {
+      return;
+    }
+    q.push([this.#root, 0]);
+    while (!q.isEmpty()) {
+      const [current, currentLevel] = q.pop();
+      current.left && q.push([current.left, currentLevel + 1]);
+      current.right && q.push([current.right, currentLevel + 1]);
+      yield [current.value, currentLevel];
+    }
+  }
+
   delete(value: T): boolean {
     let currentNode = this.#root,
       parentNode = this.#root,
@@ -70,35 +122,66 @@ export class BinarySearchTree<T> {
         parentNode.right = null;
       }
 
-    // 2. Один потомок
+      // 2. Один потомок
     } else if (parentNode && !currentNode.right) {
       if (currentNode === this.#root) {
         this.#root = currentNode.left;
-      } if (isLeft) {
-        parentNode.left = currentNode.left
+      }
+      if (isLeft) {
+        parentNode.left = currentNode.left;
       } else {
         parentNode.right = currentNode.left;
       }
     } else if (parentNode && !currentNode.left) {
       if (currentNode === this.#root) {
         this.#root = currentNode.right;
-      } if (isLeft) {
-        parentNode.left = currentNode.right
+      }
+      if (isLeft) {
+        parentNode.left = currentNode.right;
       } else {
         parentNode.right = currentNode.right;
       }
 
-    // 3. Два потомка
-    } else if () {
-
+      // 3. Два потомка
+    } else if (parentNode) {
+      const successor = this.#getSuccessor(currentNode);
+      if (currentNode === this.#root) {
+        this.#root = successor;
+      } else if (isLeft) {
+        parentNode.left = successor;
+      } else {
+        parentNode.right = successor;
+      }
+      successor.left = currentNode.left;
     }
 
     return true;
   }
 
-  #getSuccessor(value: TreeNode<T> | null): TreeNode<T> | null {
+  #getSuccessor(value: TreeNode<T> | null): TreeNode<T> {
     if (!value) {
-      return null;
+      throw Error(
+        'Поиск приемника должен происходить только в соответствующем случае, когда преемник точно есть.',
+      );
     }
+
+    let successor = value;
+    let successorParent = value;
+    let current = value?.right;
+
+    while (current) {
+      successorParent = successor;
+      successor = current;
+      current = current.left;
+    }
+
+    if (successor !== value.right) {
+      if (successorParent && successor) {
+        successorParent.left = successor.right;
+        successor.right = value.right;
+      }
+    }
+
+    return successor;
   }
 }

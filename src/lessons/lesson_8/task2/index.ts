@@ -7,6 +7,7 @@
 
 import { BinarySearchTree } from '../../../common/BinarySearchTree';
 
+console.log('\n-- create binary search Tree');
 const tree = new BinarySearchTree();
 tree.insert(10);
 tree.insert(20);
@@ -16,5 +17,26 @@ tree.insert(15);
 tree.insert(25);
 tree.insert(35);
 tree.insert(5);
-
 console.log(tree.root);
+
+console.log('\n-- inOrder traverse');
+const arr = [];
+for (const value of tree.inOrder()) {
+  arr.push(value);
+}
+console.log(arr);
+
+console.log('\n-- delete node');
+tree.delete(20);
+console.log(tree.root);
+
+console.log('\n-- bfs with node level');
+const obj = new Map();
+for (const [nodeValue, level] of tree.bfs()) {
+  if (!obj.get(level)) {
+    obj.set(level, [nodeValue]);
+  } else {
+    obj.get(level).push(nodeValue);
+  }
+}
+console.log(obj);
