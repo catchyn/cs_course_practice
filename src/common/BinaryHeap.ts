@@ -14,7 +14,8 @@ export class BinaryHeap<T> {
     if (array && size) {
       this.#buffer = array;
       this.#maxSize = size;
-      this.#insertFromArray(array);
+      this.#currentSize = array.length;
+      this.#restoreHeap();
       return;
     }
 
@@ -136,9 +137,9 @@ export class BinaryHeap<T> {
     return Math.floor((childIndex - 1) / 2);
   }
 
-  #insertFromArray(arr: T[]) {
-    for (let i = 0; i < arr.length; i++) {
-      this.insert(arr[i]);
+  #restoreHeap() {
+    for (let i = Math.floor(this.#currentSize / 2) - 1; i >= 0; i--) {
+      this.#goDown(i);
     }
   }
 }
