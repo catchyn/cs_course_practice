@@ -1,38 +1,111 @@
-# ДЗ к лекции База#19
+x# ДЗ к лекции База#17
 
-## Необходимо написать контейнерный тип Result
+## Пояснение
 
-У которого будет два состояния: Ok и Err.
+### Парсер
 
-```js
-const res1 = new Result(() => 42);
+Функция принимающая Iterable (в нашем случае Iterable строк) и предыдущее состояние (опционально).
+Возвращает такая функция генератор, элементами которого являются токены, а возвращаемым значением пара, где первым параметром
+идет результат парсинга, а вторым - Iterable для последующего парсинга. Если парсинг невозможен - парсер выбрасывает исключение.
 
-res1.then((data) => {
-  console.log(data);
-});
+```typescript
+interface ParserToken<T = unknown> {
+  type: string;
+  value?: T;
+}
 
-const res2 = new Result(() => { throw 'Boom!'; });
+interface ParserValue<T = unknown> extends ParserToken<T> {
 
-res1.then((data) => {
-  // Этот callback не вызовется
-  console.log(data);
+}
 
-// А этот вызовется
-}).catch(console.error);
+type ParserResult<T = unknown> = [ParserValue, Iterable<string>];
+
+type Parser<T = unknown, R = unknown> =
+  (iterable: Iterable<string>, prev?: ParserValue) =>
+    Generator<ParserToken<T>, ParserResult<R>, Iterable<string> | undefined>;
 ```
 
-## Необходимо используя генераторы создать аналог async/await для контейнера Result
+## Необходимо написать парсерный генератор tag
 
-```js
-exec(function* main() {
-  const res1 = new Result(() => 42);
-  console.log(yield result);
+Функция принимает строку и возвращает парсер, который считывает в заданному Iterable указанную строку.
 
-  try {
-    const res2 = new Result(() => { throw 'Boom!'; });
+```typescript
+const fnTag = tag('function')('function foo() {}');
 
-  } catch (err) {
-    console.error(err);
-  }
-});
+console.log(fnTag.next()); // {done: true, value: {type: 'TAG', value: 'function'}}
+```
+
+## Необходимо написать парсерный генератор take
+
+Функция принимает функцию или регулярное выражение и возвращает парсер, который считывает символы походящие под условие.
+Генератор должен настраиваться опциональными параметрами min и max для указания минимального и максимального количество считанных символов.
+
+```typescript
+const takeNumber = take(/\d/)('1234 foo');
+
+console.log(takeNumber.next()); // {done: true, value: {type: 'TAKE', value: '1234'}}
+
+const takeNumber2 = take(/\d/)('1234 foo', {max: 2});
+
+console.log(takeNumber.next()); // {done: true, value: {type: 'TAKE', value: '12'}}
+```
+
+## Необходимо написать парсерный комбинатор seq
+
+Функция принимает множество парсеров и возвращает новый, который последовательно считывает символы походящие под заданные парсеры.
+
+```typescript
+const fnExpr = seq(
+  tag('function '),
+  
+  take(/[a-z_$]/i, {max: 1}),
+  take(/\w/, {min: 0}),
+  
+  tag('()')
+)('function foo() {}');
+
+console.log(fnExpr.next()); // {done: true, value: {type: 'SEQ', value: 'function foo()'}}
+```
+
+## Необходимо написать парсерный комбинатор or
+
+Функция принимает множество парсеров и возвращает новый, который пытается применить первые иетратор, а если это невозможно, то пробует второй и т.д.
+
+```typescript
+const boolExpr = or(
+  tag('true'),
+  tag('false')
+)('false');
+
+console.log(fnExpr.next()); // {done: true, value: {type: 'TAG', value: 'false'}}
+```
+
+## Необходимо написать парсерный комбинатор repeat
+
+Функция принимает парсер и параметры min/max и возвращает новый, который применяет заданный итератор указанное количество раз.
+
+```typescript
+const takeNumbers = repeat(
+  seq(take(/\d/), tag(',')),
+  {min: 1}
+)('100,200,300,');
+
+console.log(fnExpr.next()); // {done: false, value: {type: 'SEQ', value: '100,'}}
+console.log(fnExpr.next()); // {done: false, value: {type: 'SEQ', value: '200,'}}
+console.log(fnExpr.next()); // {done: false, value: {type: 'SEQ', value: '300,'}}
+```
+
+## Необходимо написать парсерный комбинатор opt
+
+Функция принимает парсер и возвращает новый, который применяет заданный итератор один раз или ноль (если применить парсер невозможно).
+
+```typescript
+const takeNumbers = repeat(
+  seq(take(/\d/), opt(tag(','))),
+  {min: 1}
+)('100,200,300');
+
+console.log(fnExpr.next()); // {done: false, value: {type: 'SEQ', value: '100,'}}
+console.log(fnExpr.next()); // {done: false, value: {type: 'SEQ', value: '200,'}}
+console.log(fnExpr.next()); // {done: false, value: {type: 'SEQ', value: '300'}}
 ```

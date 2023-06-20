@@ -1,96 +1,26 @@
-import {getErrorMsg} from "../../utils/error";
+import { tag } from '../../common/parser/tag';
+import { take } from '../../common/parser/take';
+import { seq } from '../../common/parser/seq';
 
-enum ResultState {
-    'OK' = 'OK',
-    'ERR' = 'ERR'
-}
+const fnTag = tag('function')('function foo() {}');
 
-export class Result {
-    result: unknown;
-    state: ResultState = ResultState.OK;
-    errMessage?: string;
+console.log(fnTag.next()); // {done: true, value: {type: 'TAG', value: 'function'}}
 
-    constructor(func: () => unknown) {
-        try {
-            this.result = func();
-        } catch(e) {
-            this.errorHandler(e);
-        }
-    }
+const takeNumber = take(/\d/)('1234 foo');
 
-    then(f: (data: unknown) => unknown) {
-        if (this.state === ResultState.OK) {
-            try {
-                this.result = f(this.result);
-            } catch(e) {
-                this.errorHandler(e);
-            }
-        }
-        return this;
-    }
+console.log(takeNumber.next()); // {done: true, value: {type: 'TAKE', value: '1234'}}
 
-    catch(errF: (error?: string) => void) {
-        if (this.state === ResultState.ERR) {
-            errF(this.errMessage);
-        }
-    }
+const takeNumber2 = take(/\d/, { max: 2 })('1234 foo');
 
-    private errorHandler(e: unknown) {
-        this.state = ResultState.ERR;
-        this.errMessage = getErrorMsg(e as string | Error);
-    }
-}
+console.log(takeNumber2.next()); // {done: true, value: {type: 'TAKE', value: '12'}}
 
-function exec(executor: () => Generator<Result, void, unknown>) {
-    const executorGenerator = executor();
-    const chunk = executorGenerator.next();
+const fnExpr = seq(
+  tag('function '),
 
-    function evaluate(chunk: IteratorResult<Result>) {
-        if (!chunk.done) {
-            chunk.value.then((value) => {
-                evaluate(executorGenerator.next(value));
-            }).catch((error) => {
-                evaluate(executorGenerator.throw(error));
-            })
-        }
-    }
+  take(/[a-z_$]/i, { max: 1 }),
+  take(/\w/, { min: 0 }),
 
-    evaluate(chunk);
-}
+  tag('()'),
+)('function foo() {}');
 
-// 1
-const res1 = new Result(() => 42);
-res1.then((data) => {
-    console.log(data);
-});
-
-// 2
-const res2 = new Result(() => { throw 'Boom!'; });
-res2.then((data) => {
-    // Этот callback не вызовется
-    console.log(data);
-// А этот вызовется
-}).catch(console.error);
-
-// 3
-const res3 = new Result(() => 55);
-res3.then((data) => {
-    if (typeof data === 'number') {
-        return data ** 2;
-    }
-    return data;
-}).then((data) => {
-    console.log('Result = ' + data);
-});
-
-// 4
-exec(function* main() {
-    const res1 = new Result(() => 42);
-    console.log(yield res1);
-    try {
-        const res2 = new Result(() => { throw 'Boom!'; });
-        yield res2;
-    } catch (err) {
-        console.error(err);
-    }
-});
+console.log(fnExpr.next()); // {done: true, value: {type: 'SEQ', value: 'function foo()'}}
