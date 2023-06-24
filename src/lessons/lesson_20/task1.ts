@@ -1,10 +1,20 @@
 import { Result } from '../../common/Result';
 
 const res = new Result(() => 42);
-console.log('started');
-res.flatMap(() => Result.Error('Boom')).catch(console.error);
-// res
-//   .flatMap((value) => new Result(() => value + 'Boom'))
-//   .then((value) => console.log('result ' + value));
+res.flatMap(() => Result.Error('Boom')).catch(console.error); // Boom
 
-// res.then((value) => console.log('result ' + value));
+const res1 = new Result(() => 42);
+res1.map((value) => value * 10).then(console.log); // 420
+
+// @ts-ignore
+Function.prototype.map = function <T, R, K>(
+  this: (value: T) => R,
+  fn: (value: K) => T,
+): (value: K) => R {
+  return (value) => {
+    return this(fn(value));
+  };
+};
+
+// @ts-ignore
+console.log(((v: number) => v * 10).map(() => 42)()); // 420

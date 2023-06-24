@@ -5,56 +5,73 @@ enum ResultState {
   'ERR' = 'ERR',
 }
 
-export class Result {
-  result: unknown;
-  state: ResultState;
+export class Result<T> {
+  data: T | null = null;
+  state: ResultState | undefined;
   errMessage?: string;
 
-  constructor(func: () => unknown) {
+  static Resolve<R>(value: Result<R> | R): Result<R> {
+    return new Result(() => value);
+  }
+
+  static Error(errMessage?: string): Result<void> {
+    return new Result(() => {
+      throw new Error(errMessage || 'UnknownError');
+    });
+  }
+
+  constructor(fn: () => T | Result<T>) {
     try {
-      this.state = ResultState.OK;
-      this.result = func();
+      const data = fn();
+
+      if (data instanceof Result) {
+        data
+          .then((value) => {
+            this.state = ResultState.OK;
+            this.data = value;
+          })
+          .catch((e) => {
+            this.state = ResultState.ERR;
+            this.errMessage = getErrorMsg(e as string | Error);
+          });
+      } else {
+        this.state = ResultState.OK;
+        this.data = data;
+      }
     } catch (e) {
       this.state = ResultState.ERR;
       this.errMessage = getErrorMsg(e as string | Error);
     }
   }
 
-  static Error(errMessage: string): Result {
-    return new Result(() => {
-      throw new Error(errMessage);
-    });
+  flatMap<R>(fn: (value: T) => Result<R>): Result<R | void> {
+    try {
+      return Result.Resolve(fn(this.data as T));
+    } catch (e) {
+      return Result.Error(getErrorMsg(e as string | Error));
+    }
   }
 
-  flatMap(func: (value: unknown) => Result) {
-    return new Result(() => {
-      let result;
-      func(this.result)
-        .then((value) => {
-          result = value;
-        })
-        .catch((message) => {
-          result = message;
-        });
-      return result;
-    });
+  map<R>(fn: (value: T) => R): Result<R | void> {
+    try {
+      return Result.Resolve(fn(this.data as T));
+    } catch (e) {
+      return Result.Error(getErrorMsg(e as string | Error));
+    }
   }
 
-  then(f: (data: unknown) => unknown) {
+  then<R>(fn: (data: T) => R | Result<R>): Result<R | void> {
     if (this.state === ResultState.OK) {
-      try {
-        this.result = f(this.result);
-      } catch (e) {
-        this.state = ResultState.ERR;
-        this.errMessage = getErrorMsg(e as string | Error);
-      }
+      return new Result(() => fn(this.data as T));
     }
-    return this;
+
+    return Result.Error(this.errMessage);
   }
 
-  catch(errF: (error?: string) => void) {
+  catch<R>(fn: (error?: string) => Result<R> | R): Result<T | R> {
     if (this.state === ResultState.ERR) {
-      errF(this.errMessage);
+      return new Result(() => fn(this.errMessage));
     }
+    return Result.Resolve(this);
   }
 }
