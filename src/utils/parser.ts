@@ -1,4 +1,4 @@
-export const createIterableIterator = <T>(iter: Iterator<T> | Iterable<T>): IterableIterator<T> => {
+export const intoIterableIter = <T>(iter: Iterator<T> | Iterable<T>): IterableIterator<T> => {
   if (typeof (iter as Iterable<T>)[Symbol.iterator] === 'function') {
     const newIter = (iter as Iterable<T>)[Symbol.iterator]();
     return {

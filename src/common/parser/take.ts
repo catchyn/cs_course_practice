@@ -1,71 +1,77 @@
-import { Parser, ParserState } from '../../types/Parser';
-import { createIterableIterator } from '../../utils/parser';
+import { Parser, ParserError, ParserOptions, ParserState } from '../../types/Parser';
+import { Test, testChar } from './test';
+import { intoIterableIter } from '../../utils/parser';
+import { seq } from '../iterators/seq';
 
-export const take = (
-  regexp: RegExp,
-  options: { max?: number; min?: number } = {},
-): Parser<string, string> => {
-  return function* (data: Iterable<string>) {
-    const { min = 1, max = Infinity } = options;
-    let iter = createIterableIterator(data);
+type TakeOptions = ParserOptions<string> & {
+  min?: number;
+  max?: number;
+};
+
+export function take(test: Test, opts: TakeOptions = {}): Parser<string, string> {
+  return function* (source, prev) {
+    const { min = 1, max = Infinity } = opts;
+
+    const buffer: string[] = [];
+
+    let iter = intoIterableIter(source),
+      count = 0;
+
     let value = '';
-    let rest = '';
-    let count = 0;
 
     while (true) {
       if (count >= max) {
         break;
       }
-      let chunk = iter.next();
-      let chunkValue = chunk.value;
+
+      let chunk = iter.next(),
+        char = chunk.value;
 
       if (chunk.done) {
         if (count >= min) {
           break;
         }
-        const newData = yield ParserState.EXPECT_NEW_INPUT;
-        if (!newData) {
-          throw new Error('incorrect data');
+
+        const data = yield ParserState.EXPECT_NEW_INPUT;
+
+        if (data == null) {
+          throw new ParserError('Invalid input', prev);
         }
-        data = newData;
-        iter = createIterableIterator(data);
+
+        source = data;
+        iter = intoIterableIter(source);
         chunk = iter.next();
-        chunkValue = chunk.value;
+        char = chunk.value;
       }
 
       try {
-        if (!regexp.test(chunkValue)) {
-          throw new Error("incorrect data. Bad symbol - '" + chunkValue + "'");
-        } else {
+        if (testChar(test, char, prev)) {
           count++;
         }
-      } catch (e) {
+      } catch (err) {
         if (count < min) {
-          throw e;
+          throw err;
         }
 
-        rest += chunkValue;
+        buffer.push(char);
         break;
       }
 
-      value += chunkValue;
+      value += char;
     }
 
-    let newIter = iter;
-    if (rest) {
-      const iterRest = createIterableIterator(rest);
-      newIter = createIterableIterator({
-        next: () => {
-          const next = iterRest.next();
-          if (!next.done) {
-            return next;
-          } else {
-            return iter.next();
-          }
-        },
-      });
+    if (opts.token && count > 0) {
+      yield {
+        type: opts.token,
+        value: opts.tokenValue?.(value) ?? value,
+      };
     }
 
-    return [{ type: 'TAKE', value: value }, newIter];
+    const token = {
+      type: 'TAKE',
+      value,
+    };
+
+    return [token, buffer.length > 0 ? seq(buffer, iter) : iter];
   };
-};
+}

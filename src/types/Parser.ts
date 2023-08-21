@@ -15,3 +15,17 @@ export type Parser<T = unknown, R = unknown> = (
 export enum ParserState {
   EXPECT_NEW_INPUT = 'EXPECT_NEW_INPUT',
 }
+
+export type ParserOptions<T = unknown> = {
+  token?: string;
+  tokenValue?(value: unknown): T;
+};
+
+export class ParserError extends Error {
+  prev: ParserValue | undefined;
+
+  constructor(message: string, prev: ParserValue | undefined) {
+    super(message);
+    this.prev = prev;
+  }
+}

@@ -1,25 +1,43 @@
-import { Parser, ParserState, ParserToken } from '../../types/Parser';
-import { createIterableIterator } from '../../utils/parser';
+import { Parser, ParserOptions, ParserState } from '../../types/Parser';
+import { intoIterableIter } from '../../utils/parser';
 
-export function seq(...parsers: Parser<string, string>[]) {
-  return function* (data: Iterable<string>) {
-    let iter = createIterableIterator(data);
-    const value: ParserToken[] = [];
-    let chunkValue;
+export function seq<T = unknown, R = unknown>(...parsers: Parser[]): Parser<T | T[], R[]>;
+
+export function seq<T = unknown, R = unknown>(
+  opts: ParserOptions,
+  ...parsers: Parser[]
+): Parser<T | T[], R[]>;
+
+export function seq(optsOrParser: ParserOptions | Parser, ...parsers: Parser[]): Parser {
+  let opts: ParserOptions = {};
+
+  if (typeof optsOrParser === 'function') {
+    parsers.unshift(optsOrParser);
+  } else {
+    opts = optsOrParser;
+  }
+
+  return function* (source, prev) {
+    const value: unknown[] = [];
+
+    let iter = intoIterableIter(source),
+      data;
 
     for (const parser of parsers) {
-      const parserGen = parser(iter);
+      const parsing = parser(iter, prev);
 
       while (true) {
-        const chunk = parserGen.next(chunkValue);
+        const chunk = parsing.next(data);
 
         if (chunk.done) {
-          value.push(chunk.value[0]);
-          iter = createIterableIterator(chunk.value[1]);
+          prev = chunk.value[0];
+          value.push(prev);
+
+          iter = intoIterableIter(chunk.value[1]);
           break;
         } else {
           if (chunk.value === ParserState.EXPECT_NEW_INPUT) {
-            chunkValue = yield chunk.value;
+            data = yield chunk.value;
           } else {
             yield chunk.value;
           }
@@ -27,6 +45,18 @@ export function seq(...parsers: Parser<string, string>[]) {
       }
     }
 
-    return [{ type: 'SEQ', value: value?.reduce((acc, item) => acc + item.value, '') }, iter];
+    if (opts.token) {
+      yield {
+        type: opts.token,
+        value: opts.tokenValue?.(value) ?? value,
+      };
+    }
+
+    const token = {
+      type: 'SEQ',
+      value,
+    };
+
+    return [token, iter];
   };
 }

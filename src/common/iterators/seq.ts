@@ -1,7 +1,7 @@
-export const seq = (...args: Iterable<unknown>[]): IterableIterator<unknown> => {
+export const seq = <T>(...args: Iterable<T>[]): IterableIterator<T> => {
   const argsIterator = args[Symbol.iterator]();
   let arg = argsIterator.next(),
-    argIterator: Iterator<unknown>;
+    argIterator: Iterator<T>;
   if (arg.value) {
     argIterator = arg.value[Symbol.iterator]();
   }

@@ -13,7 +13,7 @@ console.log(takeNumber.next()); // {done: true, value: {type: 'TAKE', value: '12
 const takeNumber2 = take(/\d/, { max: 2 })('1234 foo');
 
 console.log(takeNumber2.next()); // {done: true, value: {type: 'TAKE', value: '12'}}
-
+//
 const fnExpr = seq(
   tag('function '),
 
