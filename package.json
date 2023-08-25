@@ -6,10 +6,7 @@
     "check-types": "tsc --noemit",
     "eslint": "eslint",
     "lint": "npm run eslint && npm run check-types",
-    "test": "jest",
-    "hw-legacy-script-run": "npx ts-node -P tsconfig.node.json -r tsconfig-paths/register src/lessons/lesson_%npm_config_LESSON%/task%npm_config_TASK%/index.ts",
-    "hw-script-run": "npx ts-node -P tsconfig.node.json -r tsconfig-paths/register src/lessons/lesson_%npm_config_LESSON%/task%npm_config_TASK%.ts",
-    "hw-interface-run": "tsc && browser-sync start --server --startPath src/lessons/lesson_%npm_config_LESSON%/task%npm_config_TASK%/index.html"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
