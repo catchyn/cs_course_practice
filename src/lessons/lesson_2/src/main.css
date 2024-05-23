@@ -1,0 +1,43 @@
+body {
+    max-width: 1024px;
+    margin: 16px auto;
+}
+
+h1 {
+    font-size: 42px;
+    text-align: center;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+main input {
+    width: 280px;
+}
+
+main > * {
+    margin-top: 16px;
+}
+
+.canvas {
+    padding: 8px;
+    border: 1px solid rgba(56, 0, 0, 0.75);
+}
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+label:not(:first-child) {
+    margin-left: 16px;
+}
+
+label {
+    align-items: baseline;
+}

@@ -7,7 +7,8 @@ String.prototype.capitalize = function (this: string): string {
   if (!this.length) {
     return this;
   }
-  return this.charAt(0).toUpperCase() + this.slice(1);
+  const chunks = [...this];
+  return chunks[0].toUpperCase() + chunks.slice(1).join('');
 };
 
 console.log('foo'.capitalize());
