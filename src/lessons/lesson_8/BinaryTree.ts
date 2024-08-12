@@ -1,4 +1,4 @@
-type FnComparator<T> = (a: T, b: T) => number;
+export type FnComparator<T> = (a: T, b: T) => number;
 
 export class BinaryTreeNode<T> {
   constructor(
