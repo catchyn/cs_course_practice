@@ -1,6 +1,6 @@
 import { Range } from './range';
 
-describe('test Range', () => {
+describe('test Range.ts', () => {
   it('test string range', () => {
     const symbolRange = new Range('a', 'f');
     const arr = Array.from(symbolRange);

@@ -12,7 +12,7 @@ describe('Test Take function', () => {
     const token = takeNumber.next().value[0];
     expect(token).toEqual({ type: 'TAKE', value: '12' });
   });
-  it('should use no contain regexp', function () {
+  it('should use no contain regexp.ts', function () {
     const takeNumber = take(/\d/)('foo');
     expect(() => takeNumber.next().value[0]).toThrowError(
       new Error('Parser error. Take. Symbol f not equal template. Number symbols less than MIN.'),
